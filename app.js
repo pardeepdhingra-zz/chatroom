@@ -24,11 +24,18 @@ io.sockets.on('connection', function(socket) {
 		io.sockets.emit('updatechat', socket.username, data);
 	});
 
+
+	//when the client emits 'sendprivatechat', this listens and executes
+	socket.on('sendprivatechat', function(data) { 
+		socket.broadcast.to(data.username).emit('updatechat', socket.username, data.message);
+	});
+
 	//when the client emits 'adduser', this listens and execute
 
 	socket.on('adduser', function(username){ 
 		//we store the username in the socket session for this client
 		socket.username = username;
+		socket.join(username);
 		
 		//add client's username to global list
 		usernames[username] = username;

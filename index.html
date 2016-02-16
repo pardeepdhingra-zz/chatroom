@@ -16,8 +16,12 @@
 	socket.on('updateusers', function(usernames){ 
 		$("#users").empty();
 		$.each(usernames, function(k, v){ 
-			$("#users").append('<div>' + k + '</div>');
+			$("#users").append('<div><a class="choose_user" id="'+ k +'">'+ v + '</a></div>');
 		});
+	});
+
+	$(document).on('click', 'a.choose_user', function(){
+		$("#selected_user").val($(this).attr('id'));
 	});
 
 	$(function(){ 
@@ -27,7 +31,11 @@
 			var message = $("#data").val();
 			$("#data").val('');
 			//tell server to execute 'sendchat'
-			socket.emit('sendchat', message);
+			if($("#selected_user").val() != '') {
+				socket.emit('sendprivatechat', { username: $("#selected_user").val(), message: message });
+		   }else{
+				socket.emit('sendchat', message);
+		   }
 		});
 
 		$("#data").on('keypress', function(e){ 
@@ -49,6 +57,8 @@
 <div style="float: left;width:300px;height: 250px; overflow: scroll-y;padding:10px;">
 	<div id="conversations"></div>
 	<br/><br/>
+	Message: <br/>
 	<input id="data" style="width: 200px;" />
+	<input type="hidden" id="selected_user" />
 	<input type="button" id="datasend" value= "send" />
 </div>
